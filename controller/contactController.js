@@ -18,13 +18,52 @@ export const createContact = asyncHandler(async (req, res) => {
       phone: phone,
     });
     res.status(201).json(contact);
-  } catch (error) {}
+  } catch (error) {
+    console.log(error.message);
+  }
+});
+
+export const getContact = asyncHandler(async (req, res) => {
+  try {
+    const contact = await Contact.findById(req.params.id);
+    if (contact) {
+      res.status(200).json(contact);
+    }
+    res.status(404).json({ message: "no contact found" });
+  } catch (error) {
+    console.log(error.message);
+  }
 });
 
 export const updateContact = asyncHandler(async (req, res) => {
-  res.status(200).json({ message: `update contact ${req.params.id}` });
+  try {
+    const contact = await Contact.findById(req.params.id);
+    if (!contact) {
+      res.status(404).json({ message: "no contact found" });
+    }
+    const updatedContact = await Contact.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.status(200).json(updatedContact);
+  } catch (error) {
+    console.log(error.message);
+  }
 });
 
 export const deleteContact = asyncHandler(async (req, res) => {
-  res.status(200).json({ message: `delete contact ${req.params.id}` });
+    try {
+        const contact = await Contact.findById(req.params.id);
+    if (!contact) {
+      res.status(404).json({ message: "no contact found" });
+    }
+    const deletedContact = await Contact.findByIdAndDelete(
+        req.params.id
+      );
+        res.status(200).json({message:'deleted successfully'});
+    } catch (error) {
+        console.log(error.message);
+    }
+  
 });
