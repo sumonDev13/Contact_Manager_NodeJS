@@ -1,9 +1,12 @@
 import express from 'express';
 const router = express.Router();
 
-router.get('/',(req,res)=>{
-    res.status(200).json({message: 'Get all Contacts'});
-})
+import { getContacts,createContact,updateContact,deleteContact } from '../controller/contactController.js';
+
+router.get('/',getContacts)
+router.post('/',createContact)
+router.put('/:id',updateContact)
+router.delete('/:id',deleteContact)
 
 
 export default router;
