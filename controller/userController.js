@@ -62,5 +62,5 @@ export const login = asyncHandler(async (req, res) => {
 });
 
 export const getUser = asyncHandler(async (req, res) => {
-  res.status(200).json({ message: "current user" });
+  res.status(200).json(req.user);
 });
