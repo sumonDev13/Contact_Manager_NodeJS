@@ -2,13 +2,17 @@ import mongoose from "mongoose";
 
 const contactSchema = mongoose.Schema(
   {
+    user_id: { type:mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref:'user'
+    },
     name: {
       type: "string",
       required: [true, "please provide a name"],
     },
     email: {
       type: "string",
-      required: [true, "please provide a email address"],
+      required: [true, "please provide a email address"], 
     },
     phone: {
       type: "string",

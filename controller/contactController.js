@@ -2,7 +2,7 @@ import asyncHandler from "express-async-handler";
 import { Contact } from "../models/contactModel.js";
 
 export const getContacts = asyncHandler(async (req, res) => {
-  const contacts = await Contact.find();
+  const contacts = await Contact.find({user_id: req.user.id});
   res.status(200).json(contacts);
 });
 
@@ -16,6 +16,7 @@ export const createContact = asyncHandler(async (req, res) => {
       name: name,
       email: email,
       phone: phone,
+      user_id: req.user.id
     });
     res.status(201).json(contact);
   } catch (error) {
