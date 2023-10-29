@@ -1,8 +1,9 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import router from './routes/contactRoutes.js';
-import { errorHandler } from './middleware/errorHandler.js';
-import { connectionDB } from './config/db.js';
+import express from "express";
+import dotenv from "dotenv";
+import routes from "./routes/index.js";
+
+import { errorHandler } from "./middleware/errorHandler.js";
+import { connectionDB } from "./config/db.js";
 
 const app = express();
 app.use(express.json());
@@ -12,8 +13,9 @@ dotenv.config();
 const port = process.env.PORT;
 connectionDB();
 
-app.use('/api/contacts',router)
+app.use("/api", routes);
 
-app.listen(port,() => {
-    console.log(`listening on ${port}`)
+
+app.listen(port, () => {
+  console.log(`listening on ${port}`);
 });
