@@ -1,38 +1,66 @@
 import bcrypt from "bcrypt";
 import { User } from "../models/userModel.js";
+import asyncHandler from "express-async-handler";
+import jwt from "jsonwebtoken";
 
-export const registerUser = async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    if (!username || !email || !password) {
-      res.status(404).json({ message: "please fill all required" });
-    }
-    const alreadyRegistered = await User.findOne({ email: email });
-    if (alreadyRegistered) {
-      res.status(400).json({ message: "User already registered" });
-    }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await User.create({
-      email,
-      username,
-      password: hashedPassword,
-    });
-
-    if (user) {
-      res.status(200).json({ message: "User created successfully" });
-    }
-    res.status(404).json({ message: "request failed" });
-  } catch (error) {
-    console.log(error.message);
+// register users function
+export const registerUser = asyncHandler(async (req, res) => {
+  const { username, email, password } = req.body;
+  if (!username || !email || !password) {
+    res.status(400).json({ message: "all fields required" });
   }
-};
+  const userAvailable = await User.findOne({ email });
+  if (userAvailable) {
+    res.status(400).json({ message: "User already" });
+  }
 
-export const login = async (req, res) => {
-  res.status(200).json({ message: "successfully logged in" });
-};
+  //Hash password
+  const hashedPassword = await bcrypt.hash(password, 10);
+  console.log("Hashed Password: ", hashedPassword);
+  const user = await User.create({
+    username,
+    email,
+    password: hashedPassword,
+  });
 
-export const getUser = async (req, res) => {
+  console.log(`User created ${user}`);
+  if (user) {
+    res.status(201).json({ _id: user.id, email: user.email });
+  } else {
+    res.status(400).json({ message: "User not found" });
+  }
+});
+
+// login users
+
+export const login = asyncHandler(async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      res.status(400).json({ message: "email and password required" });
+    }
+    const user = await User.findOne({ email });
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const accessToken = jwt.sign(
+        {
+          user: {
+            username: user.username,
+            email: user.email,
+            id: user.id,
+          },
+        },
+        process.env.SECRET,
+        { expiresIn: "15m" }
+      );
+      res.status(200).json({ accessToken });
+    }
+    res
+      .status(400)
+      .json({ message: "provided email or password is not correct" });
+  } catch (error) {}
+});
+
+export const getUser = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "current user" });
-};
+});
